@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Jefe de Taller</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #ffaaaa;
+            margin-top: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .panel h2 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e3f2fd;
+            font-weight: 500;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .form-group select option {
+            background: #16213e;
+            color: white;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .aircraft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .aircraft-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .aircraft-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .aircraft-card.selected {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .aircraft-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .registration {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .current-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-operativo { background: linear-gradient(45deg, #4caf50, #66bb6a); }
+        .status-mantenimiento { background: linear-gradient(45deg, #ff9800, #ffb74d); color: #000; }
+        .status-reparacion { background: linear-gradient(45deg, #f44336, #e57373); }
+        .status-inactivo { background: linear-gradient(45deg, #607d8b, #78909c); }
+
+        .aircraft-details {
+            color: #b0bec5;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .quick-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .quick-btn-operativo { background: #4caf50; color: white; }
+        .quick-btn-mantenimiento { background: #ff9800; color: white; }
+        .quick-btn-reparacion { background: #f44336; color: white; }
+        .quick-btn-inactivo { background: #607d8b; color: white; }
+
+        .quick-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .activity-log {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+        }
+
+        .toast.error {
+            background: linear-gradient(45deg, #f44336, #e57373);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .aircraft-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 PANEL DE ADMINISTRACIÓN</h1>
+            <p>Gestión de Estados de Aeronaves - Jefe de Taller</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Panel de actualización individual -->
+            <div class="panel">
+                <h2>🛠️ Actualizar Estado Individual</h2>
+                <div class="form-group">
+                    <label for="aircraftSelect">Seleccionar Aeronave:</label>
+                    <select id="aircraftSelect">
+                        <option value="">Cargando aeronaves...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="statusSelect">Nuevo Estado:</label>
+                    <select id="statusSelect">
+                        <option value="operativo">✅ Operativo</option>
+                        <option value="mantenimiento">🔧 Mantenimiento</option>
+                        <option value="reparacion">⚠️ En Reparación</option>
+                        <option value="inactivo">❌ Inactivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="notesInput">Notas (opcional):</label>
+                    <input type="text" id="notesInput" placeholder="Ej: Mantenimiento rutinario programado">
+                </div>
+                <button class="btn btn-primary" onclick="updateSelectedAircraft()">
+                    Actualizar Estado
+                </button>
+            </div>
+
+            <!-- Panel de adición de nueva aeronave -->
+            <div class="panel">
+                <h2>➕ Agregar Nueva Aeronave</h2>
+                <div class="form-group">
+                    <label for="newRegistration">Matrícula:</label>
+                    <input type="text" id="newRegistration" placeholder="Ej: EC-ABC">
+                </div>
+                <div class="form-group">
+                    <label for="newManufacturer">Fabricante:</label>
+                    <input type="text" id="newManufacturer" placeholder="Ej: Boeing, Airbus">
+                </div>
+                <div class="form-group">
+                    <label for="newModel">Modelo:</label>
+                    <input type="text" id="newModel" placeholder="Ej: 737-800, A320-200">
+                </div>
+                <div class="form-group">
+                    <label for="initialStatus">Estado Inicial:</label>
+                    <select id="initialStatus">
+                        <option value="operativo">✅ Operativo</option>
+                        <option value="mantenimiento">🔧 Mantenimiento</option>
+                        <option value="reparacion">⚠️ En Reparación</option>
+                        <option value="inactivo">❌ Inactivo</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" onclick="addNewAircraft()">
+                    Agregar Aeronave
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid de aeronaves para actualización rápida -->
+        <div class="panel">
+            <h2>⚡ Actualización Rápida</h2>
+            <div class="aircraft-grid" id="aircraftGrid">
+                <!-- Las aeronaves se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Log de actividad -->
+        <div class="activity-log">
+            <h3>📋 Registro de Actividad</h3>
+            <div id="activityLog">
+                <!-- Las actividades se mostrarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración de Supabase - REEMPLAZA CON TUS CREDENCIALES
+        const SUPABASE_URL = 'https://tu-proyecto.supabase.co';
+        const SUPABASE_ANON_KEY = 'tu-anon-key-aqui';
+        
+        // Verificar si Supabase está disponible
+        let supabase = null;
+        
+        if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'https://tu-proyecto.supabase.co') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } else {
+            console.warn('Supabase no configurado, usando datos de ejemplo');
+        }
+
+        let aircraftData = [];
+        let activityLog = [];
+
+        // Datos de ejemplo
+        const sampleAircraftData = [
+            { id: 1, registration: "EC-ABC", manufacturer: "Boeing", model: "737-800", status: "operativo" },
+            { id: 2, registration: "EC-DEF", manufacturer: "Boeing", model: "737-800", status: "mantenimiento" },
+            { id: 3, registration: "EC-GHI", manufacturer: "Boeing", model: "737-MAX", status: "operativo" },
+            { id: 4, registration: "EC-JKL", manufacturer: "Airbus", model: "A320-200", status: "reparacion" },
+            { id: 5, registration: "EC-MNO", manufacturer: "Airbus", model: "A320neo", status: "operativo" },
+            { id: 6, registration: "EC-PQR", manufacturer: "Airbus", model: "A320-200", status: "inactivo" },
+            { id: 7, registration: "EC-STU", manufacturer: "Cessna", model: "Citation XLS+", status: "operativo" },
+            { id: 8, registration: "EC-VWX", manufacturer: "Cessna", model: "Citation Mustang", status: "mantenimiento" }
+        ];
+
+        // Cargar datos de aeronaves
+        async function loadAircraftData() {
+            try {
+                if (supabase) {
+                    const { data, error } = await supabase
+                        .from('aircraft')
+                        .select('*')
+                        .order('manufacturer', { ascending: true })
+                        .order('registration', { ascending: true });
+
+                    if (error) throw error;
+                    aircraftData = data || [];
+                } else {
+                    // Usar datos de ejemplo
+                    aircraftData = sampleAircraftData;
+                    console.log('Usando datos de ejemplo - Configura Supabase para datos reales');
+                }
+                
+                populateAircraftSelect();
+                renderAircraftGrid();
+                
+            } catch (error) {
+                console.error('Error cargando aeronaves:', error);
+                // Usar datos de ejemplo como respaldo
+                aircraftData = sampleAircraftData;
+                populateAircraftSelect();
+                renderAircraftGrid();
+                showToast('Usando datos de ejemplo - Error al conectar con base de datos', 'error');
+            }
+        }
+
+        // Poblar el select de aeronaves
+        function populateAircraftSelect() {
+            const select = document.getElementById('aircraftSelect');
+            select.innerHTML = '<option value="">Seleccione una aeronave...</option>';
+            
+            aircraftData.forEach(aircraft => {
+                const option = document.createElement('option');
+                option.value = aircraft.id;
+                option.textContent = `${aircraft.registration} (${aircraft.manufacturer} ${aircraft.model})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Renderizar grid de aeronaves
+        function renderAircraftGrid() {
+            const grid = document.getElementById('aircraftGrid');
+            grid.innerHTML = '';
+
+            aircraftData.forEach(aircraft => {
+                const card = document.createElement('div');
+                card.className = 'aircraft-card';
+                card.dataset.aircraftId = aircraft.id;
+                
+                card.innerHTML = `
+                    <div class="aircraft-header">
+                        <div class="registration">${aircraft.registration}</div>
+                        <div class="current-status status-${aircraft.status}">
+                            ${getStatusText(aircraft.status)}
+                        </div>
+                    </div>
+                    <div class="aircraft-details">
+                        ${aircraft.manufacturer} ${aircraft.model}
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-btn quick-btn-operativo" onclick="quickUpdate(${aircraft.id}, 'operativo')">
+                            Operativo
+                        </button>
+                        <button class="quick-btn quick-btn-mantenimiento" onclick="quickUpdate(${aircraft.id}, 'mantenimiento')">
+                            Mantenimiento
+                        </button>
+                        <button class="quick-btn quick-btn-reparacion" onclick="quickUpdate(${aircraft.id}, 'reparacion')">
+                            Reparación
+                        </button>
+                        <button class="quick-btn quick-btn-inactivo" onclick="quickUpdate(${aircraft.id}, 'inactivo')">
+                            Inactivo
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Obtener texto del estado
+        function getStatusText(status) {
+            const statusMap = {
+                'operativo': 'OPERATIVO',
+                'mantenimiento': 'MANTENIMIENTO',
+                'reparacion': 'REPARACIÓN',
+                'inactivo': 'INACTIVO'
+            };
+            return statusMap[status] || status.toUpperCase();
+        }
+
+        // Actualizar aeronave seleccionada
+        async function updateSelectedAircraft() {
+            const aircraftId = document.getElementById('aircraftSelect').value;
+            const newStatus = document.getElementById('statusSelect').value;
+            const notes = document.getElementById('notesInput').value;
+
+            if (!aircraftId) {
+                showToast('Por favor seleccione una aeronave', 'error');
+                return;
+            }
+
+            await updateAircraftStatus(aircraftId, newStatus, notes);
+            
+            // Limpiar formulario
+            document.getElementById('aircraftSelect').value = '';
+            document.getElementById('notesInput').value = '';
+        }
+
+        // Actualización rápida
+        async function quickUpdate(aircraftId, newStatus) {
+            await updateAircraftStatus(aircraftId, newStatus);
+        }
+
+        // Función principal para actualizar estado
+        async function updateAircraftStatus(aircraftId, newStatus, notes = '') {
+            try {
+                const aircraft = aircraftData.find(a => a.id == aircraftId);
+                if (!aircraft) return;
+
+                const oldStatus = aircraft.status;
+
+                if (supabase) {
+                    // Actualizar en Supabase
+                    const { error } = await supabase
+                        .from('aircraft')
+                        .update({ 
+                            status: newStatus,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', aircraftId);
+
+                    if (error) throw error;
+                } else {
+                    // Actualizar datos locales (modo ejemplo)
+                    aircraft.status = newStatus;
+                }
+
+                // Registrar actividad
+                await logActivity(aircraft.registration, oldStatus, newStatus, notes);
+                
+                // Actualizar interfaz
+                await loadAircraftData();
+                
+                showToast(`${aircraft.registration} actualizado a ${getStatusText(newStatus)}`, 'success');
+                
+            } catch (error) {
+                console.error('Error actualizando aeronave:', error);
+                showToast('Error al actualizar la aeronave', 'error');
+            }
+        }
+
+        // Agregar nueva aeronave
+        async function addNewAircraft() {
+            const registration = document.getElementById('newRegistration').value.trim().toUpperCase();
+            const manufacturer = document.getElementById('newManufacturer').value.trim();
+            const model = document.getElementById('newModel').value.trim();
+            const status = document.getElementById('initialStatus').value;
+
+            if (!registration || !manufacturer || !model) {
+                showToast('Por favor completa todos los campos', 'error');
+                return;
+            }
+
+            // Verificar si ya existe
+            if (aircraftData.find(a => a.registration === registration)) {
+                showToast('Ya existe una aeronave con esa matrícula', 'error');
+                return;
+            }
+
+            try {
+                if (supabase) {
+                    const { data, error } = await supabase
+                        .from('aircraft')
+                        .insert([{
+                            registration: registration,
+                            manufacturer: manufacturer,
+                            model: model,
+                            status: status,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        }])
+                        .select();
+
+                    if (error) throw error;
+                } else {
+                    // Modo ejemplo - agregar localmente
+                    const newId = Math.max(...aircraftData.map(a => a.id)) + 1;
+                    aircraftData.push({
+                        id: newId,
+                        registration: registration,
+                        manufacturer: manufacturer,
+                        model: model,
+                        status: status
+                    });
+                }
+
+                // Limpiar formulario
+                document.getElementById('newRegistration').value = '';
+                document.getElementById('newManufacturer').value = '';
+                document.getElementById('newModel').value = '';
+                document.getElementById('initialStatus').value = 'operativo';
+
+                // Actualizar interfaz
+                await loadAircraftData();
+                
+                showToast(`Aeronave ${registration} agregada exitosamente`, 'success');
+                
+            } catch (error) {
+                console.error('Error agregando aeronave:', error);
+                showToast('Error al agregar la aeronave', 'error');
+            }
+        }
+
+        // Registrar actividad
+        async function logActivity(registration, oldStatus, newStatus, notes = '') {
+            const activity = {
+                registration: registration,
+                old_status: oldStatus,
+                new_status: newStatus,
+                notes: notes,
+                timestamp: new Date().toISOString(),
+                user: 'Jefe de Taller' // En producción, obtener del usuario autenticado
+            };
+
+            try {
+                if (supabase) {
+                    await supabase
+                        .from('activity_log')
+                        .insert([activity]);
+                }
+                
+                // Agregar al log local
+                activityLog.unshift(activity);
+                if (activityLog.length > 20) {
+                    activityLog = activityLog.slice(0, 20); // Mantener solo los últimos 20
+                }
+                
+                renderActivityLog();
+                
+            } catch (error) {
+                console.error('Error registrando actividad:', error);
+            }
+        }
+
+        // Renderizar log de actividad
+        function renderActivityLog() {
+            const logContainer = document.getElementById('activityLog');
+            
+            if (activityLog.length === 0) {
+                logContainer.innerHTML = '<p style="color: #90caf9; text-align: center;">No hay actividad reciente</p>';
+                return;
+            }
+
+            logContainer.innerHTML = activityLog.map(activity => `
+                <div class="activity-item">
+                    <div>
+                        <strong>${activity.registration}</strong>: 
+                        ${getStatusText(activity.old_status)} → ${getStatusText(activity.new_status)}
+                        ${activity.notes ? `<br><small style="color: #90caf9;">${activity.notes}</small>` : ''}
+                    </div>
+                    <div style="color: #90caf9; font-size: 0.9em;">
+                        ${new Date(activity.timestamp).toLocaleString('es-ES')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Mostrar toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Inicializar aplicación
+        async function initApp() {
+            await loadAircraftData();
+            renderActivityLog();
+        }
+
+        // Iniciar cuando se carga la página
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
