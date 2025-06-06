@@ -324,8 +324,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Configuración de Supabase - REEMPLAZA CON TUS CREDENCIALES
-        const SUPABASE_URL = 'https://tu-proyecto.supabase.co';
-        const SUPABASE_ANON_KEY = 'tu-anon-key-aqui';
+        const SUPABASE_URL = 'https://bliqqazepyljpuyszffy.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsaXFxYXplcHlsanB1eXN6ZmZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDI3MTAsImV4cCI6MjA2NDgxODcxMH0.PrM6zSdERMGNikcqGiGUPHVbX7ydVI4W_fGBpkokufs';
         
         // Verificar si Supabase está disponible
         let supabase = null;
@@ -359,7 +359,7 @@
         // Cargar datos desde Supabase o usar datos de ejemplo
         async function loadFleetData() {
             try {
-                if (supabase && SUPABASE_URL !== 'https://tu-proyecto.supabase.co') {
+                if (supabase && SUPABASE_URL !== 'https://bliqqazepyljpuyszffy.supabase.co') {
                     const { data, error } = await supabase
                         .from('aircraft')
                         .select('*')
@@ -398,7 +398,7 @@
 
         // Escuchar cambios en tiempo real
         function setupRealtimeSubscription() {
-            if (!supabase || SUPABASE_URL === 'https://tu-proyecto.supabase.co') {
+            if (!supabase || SUPABASE_URL === 'https://bliqqazepyljpuyszffy.supabase.co') {
                 console.log('Supabase no configurado - sin actualizaciones en tiempo real');
                 return null;
             }
