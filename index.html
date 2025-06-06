@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Flota - Estado de Aeronaves</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #64b5f6, #42a5f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .last-update {
+            font-size: 1.2em;
+            color: #90caf9;
+            margin-top: 10px;
+        }
+
+        .fleet-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .aircraft-group {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .aircraft-group:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(100, 181, 246, 0.3);
+        }
+
+        .aircraft-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            background: linear-gradient(45deg, #64b5f6, #42a5f5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .group-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #e3f2fd;
+        }
+
+        .aircraft-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .aircraft-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .aircraft-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .aircraft-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .registration {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .aircraft-model {
+            font-size: 1em;
+            color: #b0bec5;
+            opacity: 0.8;
+        }
+
+        .status-badge {
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .status-operativo {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            border-left-color: #4caf50;
+            animation: pulse-green 2s infinite;
+        }
+
+        .status-mantenimiento {
+            background: linear-gradient(45deg, #ff9800, #ffb74d);
+            border-left-color: #ff9800;
+            color: #000;
+            animation: pulse-orange 2s infinite;
+        }
+
+        .status-reparacion {
+            background: linear-gradient(45deg, #f44336, #e57373);
+            border-left-color: #f44336;
+            animation: pulse-red 2s infinite;
+        }
+
+        .status-inactivo {
+            background: linear-gradient(45deg, #607d8b, #78909c);
+            border-left-color: #607d8b;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+            50% { box-shadow: 0 4px 20px rgba(76, 175, 80, 0.6); }
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3); }
+            50% { box-shadow: 0 4px 20px rgba(255, 152, 0, 0.6); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3); }
+            50% { box-shadow: 0 4px 20px rgba(244, 67, 54, 0.6); }
+        }
+
+        .admin-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-button {
+            background: linear-gradient(45deg, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(33, 150, 243, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            min-width: 400px;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #64b5f6;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            block; 
+            margin-bottom: 8px;
+            color: #e3f2fd;
+            font-weight: 500;
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-group select option {
+            background: #1a2332;
+            color: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-save {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(45deg, #607d8b, #78909c);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .fleet-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MONITOR DE FLOTA</h1>
+        <div class="last-update">Última actualización: <span id="lastUpdate"></span></div>
+    </div>
+
+
+
+    <div class="fleet-container" id="fleetContainer">
+        <!-- Los datos se cargarán aquí dinámicamente -->
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración de Supabase - REEMPLAZA CON TUS CREDENCIALES
+        const SUPABASE_URL = 'https://tu-proyecto.supabase.co';
+        const SUPABASE_ANON_KEY = 'tu-anon-key-aqui';
+        
+        // Verificar si Supabase está disponible
+        let supabase = null;
+        
+        if (typeof window.supabase !== 'undefined') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } else {
+            console.warn('Supabase no disponible, usando datos de ejemplo');
+        }
+
+        // Datos de ejemplo para cuando Supabase no esté configurado
+        const sampleData = {
+            "Boeing 737": [
+                { id: 1, registration: "EC-ABC", model: "737-800", status: "operativo" },
+                { id: 2, registration: "EC-DEF", model: "737-800", status: "mantenimiento" },
+                { id: 3, registration: "EC-GHI", model: "737-MAX", status: "operativo" }
+            ],
+            "Airbus A320": [
+                { id: 4, registration: "EC-JKL", model: "A320-200", status: "reparacion" },
+                { id: 5, registration: "EC-MNO", model: "A320neo", status: "operativo" },
+                { id: 6, registration: "EC-PQR", model: "A320-200", status: "inactivo" }
+            ],
+            "Cessna Citation": [
+                { id: 7, registration: "EC-STU", model: "Citation XLS+", status: "operativo" },
+                { id: 8, registration: "EC-VWX", model: "Citation Mustang", status: "mantenimiento" }
+            ]
+        };
+
+        let fleetData = {};
+
+        // Cargar datos desde Supabase o usar datos de ejemplo
+        async function loadFleetData() {
+            try {
+                if (supabase && SUPABASE_URL !== 'https://tu-proyecto.supabase.co') {
+                    const { data, error } = await supabase
+                        .from('aircraft')
+                        .select('*')
+                        .order('manufacturer', { ascending: true })
+                        .order('registration', { ascending: true });
+
+                    if (error) throw error;
+
+                    // Organizar datos por fabricante
+                    fleetData = {};
+                    data.forEach(aircraft => {
+                        if (!fleetData[aircraft.manufacturer]) {
+                            fleetData[aircraft.manufacturer] = [];
+                        }
+                        fleetData[aircraft.manufacturer].push({
+                            id: aircraft.id,
+                            registration: aircraft.registration,
+                            model: aircraft.model,
+                            status: aircraft.status
+                        });
+                    });
+                } else {
+                    // Usar datos de ejemplo si Supabase no está configurado
+                    console.log('Usando datos de ejemplo - Configura Supabase para datos reales');
+                    fleetData = sampleData;
+                }
+
+                renderFleet();
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                console.log('Usando datos de ejemplo como respaldo');
+                fleetData = sampleData;
+                renderFleet();
+            }
+        }
+
+        // Escuchar cambios en tiempo real
+        function setupRealtimeSubscription() {
+            if (!supabase || SUPABASE_URL === 'https://tu-proyecto.supabase.co') {
+                console.log('Supabase no configurado - sin actualizaciones en tiempo real');
+                return null;
+            }
+
+            const subscription = supabase
+                .channel('aircraft_changes')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'aircraft' },
+                    (payload) => {
+                        console.log('Cambio detectado:', payload);
+                        loadFleetData(); // Recargar datos cuando hay cambios
+                    }
+                )
+                .subscribe();
+
+            return subscription;
+        }
+
+        function getStatusClass(status) {
+            return `status-${status}`;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'operativo': 'OPERATIVO',
+                'mantenimiento': 'MANTENIMIENTO',
+                'reparacion': 'EN REPARACIÓN',
+                'inactivo': 'INACTIVO'
+            };
+            return statusMap[status] || status.toUpperCase();
+        }
+
+        function renderFleet() {
+            const container = document.getElementById('fleetContainer');
+            container.innerHTML = '';
+
+            if (Object.keys(fleetData).length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #90caf9;">
+                        <h3>Cargando datos de la flota...</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            Object.keys(fleetData).forEach(manufacturer => {
+                const group = document.createElement('div');
+                group.className = 'aircraft-group';
+                
+                group.innerHTML = `
+                    <div class="group-header">
+                        <div class="aircraft-icon">✈️</div>
+                        <h2 class="group-title">${manufacturer}</h2>
+                    </div>
+                    <div class="aircraft-list">
+                        ${fleetData[manufacturer].map(aircraft => `
+                            <div class="aircraft-item ${getStatusClass(aircraft.status)}">
+                                <div class="aircraft-info">
+                                    <div class="registration">${aircraft.registration}</div>
+                                    <div class="aircraft-model">${aircraft.model}</div>
+                                </div>
+                                <div class="status-badge ${getStatusClass(aircraft.status)}">
+                                    ${getStatusText(aircraft.status)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(group);
+            });
+
+            updateLastUpdateTime();
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastUpdate').textContent = timeString;
+        }
+
+        // Inicializar la aplicación
+        async function initApp() {
+            await loadFleetData();
+            setupRealtimeSubscription();
+            
+            // Actualizar cada 5 minutos como respaldo
+            setInterval(loadFleetData, 5 * 60 * 1000);
+            
+            // Actualizar la hora cada segundo
+            setInterval(updateLastUpdateTime, 1000);
+        }
+
+        // Iniciar cuando se carga la página
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
