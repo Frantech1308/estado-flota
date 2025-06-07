@@ -1,0 +1,227 @@
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0b1120;
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #1f2937;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #60a5fa;
+  margin: 0;
+}
+
+#last-update {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+main {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grupo {
+  background-color: #1e293b;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.grupo h2 {
+  color: #93c5fd;
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 0.5rem;
+}
+
+.avion {
+  background-color: #334155;
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  margin: 0.4rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estado {
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.Operativa { background: #22c55e; }
+.Revisión { background: #eab308; color: black; }
+.LECU { background: #0ea5e9; }
+.AOG { background: #ef4444; }
+["Pdte Pieza"] { background: #f97316; }
+
+
+main {
+  display: flex;
+  justify-content: space-around;
+  padding: 2rem;
+  gap: 1rem;
+  overflow-x: auto;
+}
+
+.columna {
+  flex: 1;
+  min-width: 300px;
+}
+
+.columna h2 {
+  text-align: center;
+  color: #38bdf8;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.grupo h3 {
+  color: #a5b4fc;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+
+main {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.columna {
+  flex: 1;
+  min-width: 320px;
+  max-width: 600px;
+}
+
+.avion {
+  background-color: #1e293b;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.info span {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  margin-top: 2px;
+}
+
+
+.avion {
+  background-color: #1e293b;
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: inset 0 0 0 1px #334155;
+  transition: all 0.2s ease;
+}
+
+.avion:hover {
+  background-color: #273549;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.info strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.info span {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.estado {
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  color: white;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+}
+
+.Operativa { background-color: #22c55e; }
+.Revisión { background-color: #eab308; color: black; }
+.LECU { background-color: #0ea5e9; }
+.AOG { background-color: #ef4444; }
+["Pdte Pieza"] { background-color: #f97316; }
+
+
+.avion {
+  background: linear-gradient(145deg, #1f2937, #111827);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s;
+}
+
+.avion:hover {
+  transform: scale(1.01);
+  background: linear-gradient(145deg, #273549, #0f172a);
+}
+
+.info strong {
+  font-size: 1.3rem;
+  color: #f8fafc;
+}
+
+.info span {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  margin-top: 0.2rem;
+}
+
+.estado {
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.5rem 1.2rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  color: white;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.Operativa { background-color: #22c55e; }
+.Revisión { background-color: #facc15; color: black; }
+.LECU { background-color: #0ea5e9; }
+.AOG { background-color: #ef4444; }
+["Pdte Pieza"] { background-color: #fb923c; }
