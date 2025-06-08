@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Flota - Estado de Aeronaves</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f1419; color: white; padding: 20px; }
+        .fleet-container { display: grid; gap: 20px; }
+        .aircraft-group { background: #1a2332; padding: 20px; border-radius: 12px; }
+        .group-title { font-size: 1.5em; margin-bottom: 10px; }
+        .aircraft-item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .status-badge { padding: 5px 10px; border-radius: 8px; font-weight: bold; }
+        .status-operativo { background: green; }
+        .status-mantenimiento { background: orange; }
+        .status-reparacion { background: red; }
+        .status-inactivo { background: gray; }
+    </style>
+</head>
+<body>
+    <h1>Monitor de Flota</h1>
+    <div class="fleet-container" id="fleetContainer"></div>
+    <script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  const supabase = createClient('https://bliqqazepyljpuyszffy.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsaXFxYXplcHlsanB1eXN6ZmZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDI3MTAsImV4cCI6MjA2NDgxODcxMH0.PrM6zSdERMGNikcqGiGUPHVbX7ydVI4W_fGBpkokufs');
+
+        let fleetData = {};
+
+        async function fetchFleetData() {
+            const { data, error } = await supabase.from('aircraft').select('*');
+            if (error) return console.error(error);
+            const grouped = {};
+            data.forEach(a => {
+                if (!grouped[a.manufacturer]) grouped[a.manufacturer] = [];
+                grouped[a.manufacturer].push(a);
+            });
+            fleetData = grouped;
+            renderFleet();
+        }
+
+        function getStatusText(status) {
+            return {
+                'operativo': 'OPERATIVO',
+                'mantenimiento': 'MANTENIMIENTO',
+                'reparacion': 'REPARACIÓN',
+                'inactivo': 'INACTIVO'
+            }[status] || status;
+        }
+
+        function renderFleet() {
+            const container = document.getElementById('fleetContainer');
+            container.innerHTML = '';
+            Object.keys(fleetData).forEach(manufacturer => {
+                const group = document.createElement('div');
+                group.className = 'aircraft-group';
+                const aircraftList = fleetData[manufacturer].map(a => `
+                    <div class="aircraft-item">
+                        <div>${a.registration} - ${a.model}</div>
+                        <div class="status-badge status-${a.status}">${getStatusText(a.status)}</div>
+                    </div>
+                `).join('');
+                group.innerHTML = `<div class="group-title">${manufacturer}</div>` + aircraftList;
+                container.appendChild(group);
+            });
+        }
+
+        window.addEventListener('load', () => {
+            fetchFleetData();
+            setInterval(fetchFleetData, 15000);
+        });
+</script>
+</body>
+</html>

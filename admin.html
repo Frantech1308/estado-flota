@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: white; padding: 20px; }
+        label, select, input { display: block; margin: 10px 0; }
+        button { padding: 10px 20px; background: #ff6b6b; border: none; border-radius: 8px; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Panel de Administración</h1>
+    <label for="aircraftSelect">Aeronave:</label>
+    <select id="aircraftSelect"></select>
+    <label for="statusSelect">Nuevo estado:</label>
+    <select id="statusSelect">
+        <option value="operativo">Operativo</option>
+        <option value="mantenimiento">Mantenimiento</option>
+        <option value="reparacion">Reparación</option>
+        <option value="inactivo">Inactivo</option>
+    </select>
+    <label for="notesInput">Notas:</label>
+    <input type="text" id="notesInput" placeholder="Notas opcionales" />
+    <button onclick="updateSelectedAircraft()">Actualizar Estado</button>
+    <script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  const supabase = createClient('https://bliqqazepyljpuyszffy.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsaXFxYXplcHlsanB1eXN6ZmZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDI3MTAsImV4cCI6MjA2NDgxODcxMH0.PrM6zSdERMGNikcqGiGUPHVbX7ydVI4W_fGBpkokufs');
+
+        async function loadAircraft() {
+            const { data, error } = await supabase.from('aircraft').select('*');
+            if (error) return alert("Error cargando aeronaves");
+            const select = document.getElementById("aircraftSelect");
+            data.forEach(a => {
+                const option = document.createElement("option");
+                option.value = a.id;
+                option.textContent = a.registration + " - " + a.model;
+                select.appendChild(option);
+            });
+        }
+
+        async function updateSelectedAircraft() {
+            const id = parseInt(document.getElementById("aircraftSelect").value);
+            const newStatus = document.getElementById("statusSelect").value;
+            const notes = document.getElementById("notesInput").value;
+
+            const { data: current, error: fetchError } = await supabase.from("aircraft").select("*").eq("id", id).single();
+            if (fetchError) return alert("Error buscando aeronave");
+
+            const { error: updateError } = await supabase.from("aircraft").update({ status: newStatus }).eq("id", id);
+            if (updateError) return alert("Error actualizando estado");
+
+            await supabase.from("activity_log").insert([{
+                registration: current.registration,
+                old_status: current.status,
+                new_status: newStatus,
+                notes: notes,
+                user_name: "Jefe de Taller"
+            }]);
+
+            alert("Estado actualizado correctamente");
+        }
+
+        window.addEventListener('load', loadAircraft);
+</script>
+</body>
+</html>
